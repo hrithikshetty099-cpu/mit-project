@@ -11,12 +11,16 @@ import adminRouter from './routes/admin.js';
 import { startEscalationJob } from './services/escalationEngine.js';
 
 const app = express();
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
+const allowedOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+app.use(cors({ origin: (origin, callback) => {
+  if (!origin || origin === allowedOrigin || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return callback(null, true);
+  callback(new Error('Origin is not allowed by CORS'));
+} }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 app.get('/api/health', async (_req, res) => {
   try { res.json({ status: 'ok', database: await checkDatabase() }); }
-  catch (error) { res.status(503).json({ status: 'degraded', database: error.message }); }
+  catch (error) { res.status(503).json({ status: 'degraded', error: 'PostgreSQL is unavailable. Start PostgreSQL and verify DATABASE_URL.' }); }
 });
 app.use('/api/complaints', complaintsRouter);
 app.use('/api/departments', departmentsRouter);

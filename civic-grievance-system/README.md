@@ -10,6 +10,9 @@ Install PostgreSQL with PostGIS, create a database named `civic_grievance`, then
 psql "$env:DATABASE_URL" -f backend/migrations/init.sql
 psql "$env:DATABASE_URL" -f backend/migrations/officers.sql
 psql "$env:DATABASE_URL" -f backend/migrations/auth.sql
+
+# Or run the same migrations transactionally:
+npm run db:init --prefix backend
 ```
 
 ## Run the API

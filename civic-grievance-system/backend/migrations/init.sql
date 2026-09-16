@@ -15,9 +15,15 @@ CREATE TABLE IF NOT EXISTS status_history (id SERIAL PRIMARY KEY, complaint_id I
 CREATE TABLE IF NOT EXISTS verifications (id SERIAL PRIMARY KEY, complaint_id INTEGER NOT NULL REFERENCES complaints(id) ON DELETE CASCADE, citizen_id TEXT NOT NULL, confirmed BOOLEAN NOT NULL, timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS escalations (id SERIAL PRIMARY KEY, complaint_id INTEGER NOT NULL REFERENCES complaints(id) ON DELETE CASCADE, level INTEGER NOT NULL, timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS landmarks (id SERIAL PRIMARY KEY, name TEXT NOT NULL, kind TEXT NOT NULL, location GEOGRAPHY(POINT, 4326) NOT NULL);
-INSERT INTO departments (name, category_mapping) VALUES
-  ('Road Department', '{"pothole": true}'::jsonb), ('Municipality / Waste Management', '{"garbage": true}'::jsonb),
-  ('Water Supply Department', '{"water": true}'::jsonb), ('Electricity Department', '{"electrical": true, "streetlight": true}'::jsonb) ON CONFLICT DO NOTHING;
+INSERT INTO departments (name, category_mapping)
+SELECT seed.name, seed.category_mapping
+FROM (VALUES
+  ('Road Department', '{"pothole": true}'::jsonb),
+  ('Municipality / Waste Management', '{"garbage": true}'::jsonb),
+  ('Water Supply Department', '{"water": true}'::jsonb),
+  ('Electricity Department', '{"electrical": true, "streetlight": true}'::jsonb)
+) AS seed(name, category_mapping)
+WHERE NOT EXISTS (SELECT 1 FROM departments existing WHERE existing.name = seed.name);
 
 INSERT INTO landmarks (name, kind, location) VALUES
   ('Central Hospital', 'hospital', ST_SetSRID(ST_MakePoint(77.5946, 12.9716), 4326)::geography),

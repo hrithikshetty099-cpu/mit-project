@@ -11,7 +11,10 @@ export async function registerCitizen(req, res) {
   try {
     const result = await query('INSERT INTO users (name, email, phone, password_hash, role) VALUES ($1, LOWER($2), $3, $4, \'citizen\') RETURNING id, name, email, phone, role', [name, email, phone, await bcrypt.hash(password, 12)]);
     res.status(201).json({ user: result.rows[0], token: tokenFor(result.rows[0]) });
-  } catch (error) { res.status(error.code === '23505' ? 409 : 500).json({ error: error.code === '23505' ? 'Email is already registered' : error.message }); }
+  } catch (error) {
+    if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') return res.status(503).json({ error: 'Database is unavailable. Start PostgreSQL and verify DATABASE_URL.' });
+    res.status(error.code === '23505' ? 409 : 500).json({ error: error.code === '23505' ? 'Email or phone is already registered' : error.message });
+  }
 }
 
 export async function loginCitizen(req, res) {
