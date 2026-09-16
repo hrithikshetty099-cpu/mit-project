@@ -1,0 +1,1 @@
+export const statusHistoryTable = 'status_history';

@@ -1,0 +1,2 @@
+import { useEffect, useState } from 'react'; import { getHeatmap } from '../api/complaintsApi.js'; import HeatmapView from '../components/HeatmapView.jsx';
+export default function MapPage() { const [items, setItems] = useState([]); useEffect(() => { getHeatmap().then(({ data }) => setItems(data)); }, []); return <main><div className="eyebrow">CIVIC PULSE / MAP</div><h1>Issues around you.</h1><HeatmapView complaints={items} /></main>; }

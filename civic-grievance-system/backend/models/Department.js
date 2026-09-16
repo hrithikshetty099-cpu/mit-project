@@ -1,0 +1,1 @@
+export const departmentCategories = ['pothole', 'streetlight', 'garbage', 'water', 'electrical'];

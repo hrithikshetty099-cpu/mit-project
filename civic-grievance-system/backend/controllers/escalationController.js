@@ -1,0 +1,1 @@
+export function escalationController(_req, res) { res.json({ status: 'Escalation job runs daily' }); }

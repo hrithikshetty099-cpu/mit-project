@@ -1,0 +1,2 @@
+import { Link, Route, Routes } from 'react-router-dom'; import Home from './pages/Home.jsx'; import ComplaintDetail from './pages/ComplaintDetail.jsx'; import MapPage from './pages/MapPage.jsx'; import './styles.css';
+export default function App() { return <><header><Link to="/" className="brand">CIVIC<span>///</span>CARE</Link><nav><Link to="/">Report issue</Link><Link to="/map">Explore map</Link></nav></header><Routes><Route path="/" element={<Home />} /><Route path="/complaints/:id" element={<ComplaintDetail />} /><Route path="/map" element={<MapPage />} /></Routes></>; }

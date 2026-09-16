@@ -1,0 +1,1 @@
+export const complaintStatuses = ['Reported', 'Assigned', 'Inspection', 'Work Started', 'Marked Fixed', 'Citizen Verified'];

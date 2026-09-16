@@ -1,0 +1,3 @@
+import { useState } from 'react';
+import { verifyComplaint } from '../api/complaintsApi.js';
+export default function VerifyButton({ id }) { const [sent, setSent] = useState(false); const send = async (confirmed) => { navigator.geolocation?.getCurrentPosition(async ({ coords }) => { await verifyComplaint(id, { citizen_id: `citizen-${Date.now()}`, confirmed, lat: coords.latitude, lng: coords.longitude }); setSent(true); }); }; return sent ? <p className="message">Thank you for your verification.</p> : <div className="verify"><button onClick={() => send(true)}>Looks fixed</button><button onClick={() => send(false)}>Still an issue</button></div>; }

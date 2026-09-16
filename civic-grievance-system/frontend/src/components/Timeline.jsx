@@ -1,0 +1,2 @@
+const stages = ['Reported', 'Assigned', 'Inspection', 'Work Started', 'Marked Fixed', 'Citizen Verified'];
+export default function Timeline({ history = [], status }) { return <div className="timeline">{stages.map((stage) => <div className={`timeline-step ${history.some((item) => item.stage === stage) ? 'done' : ''} ${status === stage ? 'current' : ''}`} key={stage}><span />{stage}</div>)}</div>; }
