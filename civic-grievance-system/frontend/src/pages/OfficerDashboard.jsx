@@ -1,0 +1,16 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getOfficerComplaints, updateOfficerStatus, updateOfficerRemarks, resolveOfficerComplaint } from '../api/complaintsApi.js';
+import { useLanguage } from '../i18n/I18n.jsx';
+import DashboardSidebar from '../components/DashboardSidebar.jsx';
+
+const nextStatuses = ['Assigned', 'Inspection', 'Work Started', 'Marked Fixed'];
+export default function OfficerDashboard() {
+  const { t } = useLanguage(); const [items, setItems] = useState([]); const [error, setError] = useState(''); const token = localStorage.getItem('officerToken'); const profile = JSON.parse(localStorage.getItem('officerProfile') || '{}'); const navigate = useNavigate();
+  const load = async () => { try { const response = await getOfficerComplaints(token); setItems(response.data); } catch (_error) { localStorage.removeItem('officerToken'); navigate('/officer-login'); } };
+  useEffect(() => { if (!token) navigate('/officer-login'); else load(); }, []);
+  const updateStatus = async (item, status) => { try { await updateOfficerStatus(token, item.id, status); load(); } catch (requestError) { setError(requestError.response?.data?.error || 'Status update failed.'); } };
+  const saveRemarks = async (item, remarks) => { try { await updateOfficerRemarks(token, item.id, remarks); } catch (requestError) { setError(requestError.response?.data?.error || 'Remarks update failed.'); } };
+  const resolve = async (event, item) => { const data = new FormData(); if (event.target.files[0]) data.append('after_media', event.target.files[0]); await resolveOfficerComplaint(token, item.id, data); load(); };
+  return <div className="dashboard-shell"><DashboardSidebar role="officer" department={items[0]?.department_name} /><main className="dashboard-page"><div className="dashboard-top"><div><div className="section-kicker">{t('officerWorkspace').toUpperCase()}</div><h1>{t('assignedComplaints')}</h1><p>{profile.name || t('officer')} · {items[0]?.department_name || t('department')}</p></div></div>{error && <p className="error-message">{error}</p>}<section className="table-panel"><div className="table-heading"><h2>{t('assignedComplaints')}</h2><span>{items.length} {t('complaints').toLowerCase()}</span></div><div className="complaint-table">{items.map((item) => <article className="complaint-row" key={item.id}><div><b>#{item.id}</b><h3>{item.title || item.category}</h3><p>{item.description}</p><small>{item.address || item.department_name} · {item.severity}</small><textarea className="remarks-field" defaultValue={item.officer_remarks || ''} onBlur={(event) => saveRemarks(item, event.target.value)} placeholder="Add remarks" /></div><div className="row-actions"><span className={`status-badge status-${item.status.toLowerCase().replaceAll(' ', '-')}`}>{item.status}</span><select value={item.status} onChange={(event) => updateStatus(item, event.target.value)} aria-label={`${t('updateStatus')} ${item.id}`}>{nextStatuses.map((status) => <option key={status}>{status}</option>)}</select>{item.status !== 'Marked Fixed' && <label className="upload-action">{t('uploadAfter')}<input type="file" accept="image/*" onChange={(event) => resolve(event, item)} /></label>}</div></article>)}{!items.length && <p className="empty-state">{t('noAssigned')}</p>}</div></section></main></div>;
+}

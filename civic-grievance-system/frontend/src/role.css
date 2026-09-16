@@ -1,0 +1,15 @@
+.site-nav .admin-link { color: #d9a441; font-weight: bold; }
+.welcome-panel { max-width: 760px; margin: 52px auto; padding: 42px; background: white; border: 1px solid #d7dee8; }
+.welcome-panel p { color: #5f6c7b; }
+.welcome-panel .text-button { margin-left: 18px; }
+.admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 26px; }
+.admin-stats div { padding: 22px; background: white; border: 1px solid #d7dee8; }
+.admin-stats b, .admin-stats span { display: block; }
+.admin-stats b { color: #0b3d91; font-size: 30px; }
+.admin-stats span { color: #5f6c7b; font-size: 12px; }
+.admin-row { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 15px 0; border-top: 1px solid #d7dee8; }
+.admin-row span, .admin-row small { display: block; }
+.admin-row small { color: #5f6c7b; margin-top: 3px; }
+.admin-row select { min-width: 190px; padding: 9px; border: 1px solid #d7dee8; }
+@media (max-width: 760px) { .admin-stats { grid-template-columns: 1fr; } .admin-row { align-items: flex-start; flex-direction: column; } }
+.language-picker { display: flex; align-items: center; gap: 4px; color: #f2f6fc; font-size: 11px; }.language-picker select { border: 1px solid #d9a441; background: #0b3d91; color: white; padding: 4px; }.small-action { padding: 6px 8px; margin: 0 4px 4px 0; font-size: 11px; }.danger-action { color: #9b2c2c; border-color: #9b2c2c; }

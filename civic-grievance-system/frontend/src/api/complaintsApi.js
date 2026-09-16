@@ -1,8 +1,34 @@
 import axios from 'axios';
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api' });
+const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api', timeout: 10000 });
+export function apiErrorMessage(error, fallback = 'Request failed') {
+	if (error.response?.data?.error) return error.response.data.error;
+	if (error.code === 'ECONNABORTED') return 'The server took too long to respond.';
+	if (!error.response) return 'Cannot connect to the backend. Start the backend on port 5000 and try again.';
+	return fallback;
+}
 export const getComplaints = () => api.get('/complaints');
-export const getComplaint = (id) => api.get(`/complaints/${id}`);
+export const getComplaint = (id, token = localStorage.getItem('citizenToken')) => api.get(`/complaints/${id}`, { headers: authHeaders(token) });
 export const getHeatmap = () => api.get('/complaints/heatmap');
-export const submitComplaint = (data) => api.post('/complaints', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+const authHeaders = (token) => ({ Authorization: `Bearer ${token}` });
+export const submitComplaint = (data, token) => api.post('/complaints', data, { headers: { 'Content-Type': 'multipart/form-data', ...authHeaders(token) } });
 export const updateStatus = (id, status) => api.patch(`/complaints/${id}/status`, { status });
 export const verifyComplaint = (id, payload) => api.post(`/complaints/${id}/verify`, payload);
+export const trackComplaint = (id, token = localStorage.getItem('citizenToken')) => api.get(`/complaints/${id}`, { headers: authHeaders(token) });
+export const loginOfficer = (payload) => api.post('/officers/login', payload);
+export const registerOfficer = (payload) => api.post('/officers/register', payload, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const getDepartments = () => api.get('/departments');
+export const getOfficerComplaints = (token) => api.get('/officers/complaints', { headers: { Authorization: `Bearer ${token}` } });
+export const updateOfficerStatus = (token, id, status) => api.patch(`/officers/complaints/${id}/status`, { status }, { headers: { Authorization: `Bearer ${token}` } });
+export const resolveOfficerComplaint = (token, id, data) => api.post(`/officers/complaints/${id}/resolve`, data, { headers: { Authorization: `Bearer ${token}` } });
+export const registerCitizen = (payload) => api.post('/auth/register', payload);
+export const loginCitizen = (payload) => api.post('/auth/login', payload);
+export const getCitizenComplaints = (token) => api.get('/complaints', { headers: authHeaders(token) });
+export const getAdminUsers = (token) => api.get('/admin/users', { headers: authHeaders(token) });
+export const getAdminOfficers = (token) => api.get('/admin/officers', { headers: authHeaders(token) });
+export const getAdminDepartments = (token) => api.get('/admin/departments', { headers: authHeaders(token) });
+export const getAdminComplaints = (token) => api.get('/admin/complaints', { headers: authHeaders(token) });
+export const assignOfficerDepartment = (token, id, department) => api.patch(`/admin/officers/${id}/department`, { department }, { headers: authHeaders(token) });
+export const reviewOfficer = (token, id, verification_status) => api.patch(`/admin/officers/${id}/verification`, { verification_status }, { headers: authHeaders(token) });
+export const assignComplaintDepartment = (token, id, department) => api.patch(`/admin/complaints/${id}/department`, { department }, { headers: authHeaders(token) });
+export const assignComplaintOfficer = (token, id, officer_id) => api.patch(`/admin/complaints/${id}/officer`, { officer_id }, { headers: authHeaders(token) });
+export const updateOfficerRemarks = (token, id, remarks) => api.patch(`/officers/complaints/${id}/remarks`, { remarks }, { headers: authHeaders(token) });

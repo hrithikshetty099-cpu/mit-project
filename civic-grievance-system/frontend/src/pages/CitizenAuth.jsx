@@ -1,0 +1,11 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { apiErrorMessage, loginCitizen, registerCitizen } from '../api/complaintsApi.js';
+import { useLanguage } from '../i18n/I18n.jsx';
+
+export default function CitizenAuth({ registering = false }) {
+  const { t } = useLanguage(); const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' }); const [error, setError] = useState(''); const navigate = useNavigate();
+  const submit = async (event) => { event.preventDefault(); setError(''); try { const response = registering ? await registerCitizen(form) : await loginCitizen({ identifier: form.email, password: form.password }); localStorage.setItem('citizenToken', response.data.token); localStorage.setItem('citizenProfile', JSON.stringify(response.data.user)); navigate('/citizen-dashboard'); } catch (requestError) { setError(apiErrorMessage(requestError, 'Unable to complete account request.')); } };
+  const update = (event) => setForm({ ...form, [event.target.name]: event.target.value });
+  return <main className="auth-page"><section className="auth-card"><div className="section-kicker">{t('citizenAccount').toUpperCase()}</div><h1>{registering ? t('createAccount') : t('citizenLogin')}</h1><p>{t('accessRestricted')}</p><form onSubmit={submit}>{registering && <label>{t('name')}<input name="name" value={form.name} onChange={update} required /></label>}{registering && <label>{t('phone')}<input name="phone" value={form.phone} onChange={update} required /></label>}<label>{t('email')}<input name="email" type="email" value={form.email} onChange={update} placeholder={registering ? '' : 'Email or phone number'} required /></label><label>{t('password')}<input name="password" type="password" value={form.password} onChange={update} minLength="8" required /></label>{error && <p className="error-message">{error}</p>}<button className="button primary-button">{registering ? t('register') : t('signIn')}</button></form><a className="text-button" href={registering ? '/citizen-login' : '/citizen-register'}>{registering ? t('signIn') : t('createAccount')}</a></section></main>;
+}
