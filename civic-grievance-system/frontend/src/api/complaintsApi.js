@@ -14,7 +14,8 @@ export const submitComplaint = (data, token) => api.post('/complaints', data, { 
 export const updateStatus = (id, status) => api.patch(`/complaints/${id}/status`, { status });
 export const verifyComplaint = (id, payload) => api.post(`/complaints/${id}/verify`, payload);
 export const trackComplaint = (id, token = localStorage.getItem('citizenToken')) => api.get(`/complaints/${id}`, { headers: authHeaders(token) });
-export const loginOfficer = (payload) => api.post('/officers/login', payload);
+export const requestOfficerOtp = (phone) => api.post('/officers/login/request-otp', { phone });
+export const verifyOfficerOtp = (payload) => api.post('/officers/login/verify-otp', payload);
 export const registerOfficer = (payload) => api.post('/officers/register', payload, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const getOfficerDepartments = () => api.get('/officers/departments');
 export const getDepartments = () => api.get('/departments');

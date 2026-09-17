@@ -1,0 +1,10 @@
+import { MapContainer, Marker, TileLayer } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import Timeline from './Timeline.jsx';
+
+const apiOrigin = (import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '');
+const mediaUrl = (url) => url && (url.startsWith('http') ? url : `${apiOrigin}${url}`);
+
+export default function ComplaintEvidence({ complaint }) {
+  return <div className="complaint-evidence"><p className="evidence-description">{complaint.description}</p>{complaint.media_url && (/(video|\.mp4|\.webm|\.mov)/i.test(complaint.media_url) ? <video className="evidence-media" controls src={mediaUrl(complaint.media_url)} /> : <a href={mediaUrl(complaint.media_url)} target="_blank" rel="noreferrer"><img className="evidence-media" src={mediaUrl(complaint.media_url)} alt={`Complaint ${complaint.id}`} /></a>)}{complaint.voice_url && <audio className="evidence-audio" controls src={mediaUrl(complaint.voice_url)} />}{complaint.ai_summary && <p className="evidence-summary"><b>AI summary:</b> {complaint.ai_summary}</p>}<p className="evidence-location"><b>Location:</b> {complaint.address || 'Address unavailable'} ({complaint.lat}, {complaint.lng})</p>{Number.isFinite(Number(complaint.lat)) && Number.isFinite(Number(complaint.lng)) && <MapContainer className="mini-map" center={[Number(complaint.lat), Number(complaint.lng)]} zoom={15} scrollWheelZoom={false}><TileLayer attribution="&copy; OpenStreetMap" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /><Marker position={[Number(complaint.lat), Number(complaint.lng)]} /></MapContainer>}<div className="evidence-stats"><span>Status: {complaint.status}</span><span>Severity: {complaint.severity}</span><span>Affected citizens: {complaint.affected_citizens}</span></div><Timeline history={complaint.history || []} status={complaint.status} /></div>;
+}

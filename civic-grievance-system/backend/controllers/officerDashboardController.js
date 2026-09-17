@@ -1,7 +1,7 @@
 import { query } from '../config/db.js';
 
 export async function getAssignedComplaints(req, res) {
-  const result = await query(`SELECT c.*, d.name AS department_name FROM complaints c JOIN departments d ON d.id = c.department_id JOIN officers o ON o.department = CASE d.name WHEN 'Roads & Infrastructure Department' THEN 'road_service' WHEN 'Electricity Department' THEN 'electrical' WHEN 'Waste Management & Municipality Department' THEN 'municipality' WHEN 'Water Supply Department' THEN 'water_leakage' END WHERE o.id = $1 ORDER BY c.created_at DESC`, [req.officer.id]);
+  const result = await query(`SELECT c.*, d.name AS department_name, COALESCE(json_agg(json_build_object('stage', h.stage, 'timestamp', h.timestamp) ORDER BY h.timestamp) FILTER (WHERE h.id IS NOT NULL), '[]') AS history FROM complaints c JOIN departments d ON d.id = c.department_id JOIN officers o ON o.department = CASE d.name WHEN 'Roads & Infrastructure Department' THEN 'road_service' WHEN 'Electricity Department' THEN 'electrical' WHEN 'Waste Management & Municipality Department' THEN 'municipality' WHEN 'Water Supply Department' THEN 'water_leakage' END LEFT JOIN status_history h ON h.complaint_id = c.id WHERE o.id = $1 GROUP BY c.id, d.name ORDER BY c.created_at DESC`, [req.officer.id]);
   res.json(result.rows);
 }
 

@@ -5,5 +5,5 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import { auth, requireRole } from '../middleware/auth.js';
 const router = Router();
 router.get('/', auth, requireRole('citizen', 'admin'), asyncHandler(listComplaints)); router.get('/heatmap', asyncHandler(heatmap)); router.get('/:id', auth, requireRole('citizen', 'admin'), asyncHandler(getComplaint));
-router.post('/', auth, requireRole('citizen'), upload.single('media'), asyncHandler(createComplaint)); router.patch('/:id/status', auth, requireRole('admin'), asyncHandler(updateStatus));
+router.post('/', auth, requireRole('citizen'), upload.fields([{ name: 'media', maxCount: 1 }, { name: 'voice', maxCount: 1 }]), asyncHandler(createComplaint)); router.patch('/:id/status', auth, requireRole('admin'), asyncHandler(updateStatus));
 export default router;
