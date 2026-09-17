@@ -20,7 +20,11 @@ app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 app.get('/api/health', async (_req, res) => {
   try { res.json({ status: 'ok', database: await checkDatabase() }); }
-  catch (error) { res.status(503).json({ status: 'degraded', error: 'PostgreSQL is unavailable. Start PostgreSQL and verify DATABASE_URL.' }); }
+  catch (error) {
+    console.error('Database health check failed:', error);
+    const errorMessage = error.code === '28P01' ? 'PostgreSQL rejected DATABASE_URL credentials.' : error.code === '3D000' ? 'Database civic_grievance does not exist.' : 'PostgreSQL is unavailable. Start PostgreSQL and verify DATABASE_URL.';
+    res.status(503).json({ status: 'degraded', error: errorMessage });
+  }
 });
 app.use('/api/complaints', complaintsRouter);
 app.use('/api/departments', departmentsRouter);
@@ -31,6 +35,7 @@ app.use('/api/admin', adminRouter);
 app.use((error, _req, res, _next) => {
   console.error(error);
   if (res.headersSent) return;
+  if (error.type === 'entity.parse.failed') return res.status(400).json({ error: 'Request body must be valid JSON.' });
   if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') return res.status(503).json({ error: 'Database is unavailable. Start PostgreSQL and verify DATABASE_URL.' });
   res.status(500).json({ error: 'Internal server error' });
 });

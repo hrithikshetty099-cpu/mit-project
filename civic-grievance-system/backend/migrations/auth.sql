@@ -28,10 +28,7 @@ CREATE INDEX IF NOT EXISTS complaints_officer_idx ON complaints(assigned_officer
 CREATE INDEX IF NOT EXISTS complaints_department_status_idx ON complaints(department_id, status);
 CREATE INDEX IF NOT EXISTS complaints_created_idx ON complaints(created_at);
 
-UPDATE departments SET name = 'Road Department' WHERE name = 'Public Works';
-UPDATE departments SET name = 'Municipality / Waste Management' WHERE name = 'Sanitation';
-UPDATE departments SET name = 'Water Supply Department' WHERE name = 'Water Utility';
-UPDATE departments SET name = 'Electricity Department', category_mapping = category_mapping || '{"streetlight": true}'::jsonb WHERE name = 'Electrical Utility';
-UPDATE officers SET department = (SELECT id FROM departments WHERE name = 'Electricity Department' LIMIT 1) WHERE department = (SELECT id FROM departments WHERE name = 'Street Lighting' LIMIT 1);
-UPDATE complaints SET department_id = (SELECT id FROM departments WHERE name = 'Electricity Department' LIMIT 1) WHERE department_id = (SELECT id FROM departments WHERE name = 'Street Lighting' LIMIT 1);
-DELETE FROM departments WHERE name = 'Street Lighting';
+UPDATE departments SET name = 'Roads & Infrastructure Department', category_mapping = '{"pothole": true}'::jsonb WHERE name IN ('Road Department', 'Public Works');
+UPDATE departments SET name = 'Waste Management & Municipality Department', category_mapping = '{"garbage": true}'::jsonb WHERE name IN ('Municipality / Waste Management', 'Sanitation');
+UPDATE departments SET name = 'Water Supply Department', category_mapping = '{"water": true}'::jsonb WHERE name = 'Water Utility';
+UPDATE departments SET name = 'Electricity Department', category_mapping = '{"electrical": true, "streetlight": true}'::jsonb WHERE name IN ('Electrical Utility', 'Street Lighting');

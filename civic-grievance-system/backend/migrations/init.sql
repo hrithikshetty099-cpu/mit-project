@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS landmarks (id SERIAL PRIMARY KEY, name TEXT NOT NULL,
 INSERT INTO departments (name, category_mapping)
 SELECT seed.name, seed.category_mapping
 FROM (VALUES
-  ('Road Department', '{"pothole": true}'::jsonb),
-  ('Municipality / Waste Management', '{"garbage": true}'::jsonb),
+  ('Roads & Infrastructure Department', '{"pothole": true}'::jsonb),
+  ('Waste Management & Municipality Department', '{"garbage": true}'::jsonb),
   ('Water Supply Department', '{"water": true}'::jsonb),
   ('Electricity Department', '{"electrical": true, "streetlight": true}'::jsonb)
 ) AS seed(name, category_mapping)

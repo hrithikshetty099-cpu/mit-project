@@ -4,9 +4,11 @@ import { getAssignedComplaints, updateAssignedStatus, updateAssignedRemarks, res
 import { authOfficer } from '../middleware/authOfficer.js';
 import { upload } from '../middleware/upload.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { DEPARTMENTS } from '../config/departments.js';
 
 const router = Router();
-router.post('/register', upload.single('job_id_document'), asyncHandler(registerOfficer));
+router.get('/departments', (_req, res) => res.json(DEPARTMENTS.map(({ value, name }) => ({ value, name }))));
+router.post('/register', upload.single('idCard'), asyncHandler(registerOfficer));
 router.post('/login', asyncHandler(loginOfficer));
 router.get('/me', authOfficer, asyncHandler(currentOfficer));
 router.get('/complaints', authOfficer, asyncHandler(getAssignedComplaints));
